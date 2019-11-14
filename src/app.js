@@ -10,6 +10,8 @@ ctx.fillStyle = 'green'
 ctx.fillRect(0, 0, canvas.width, canvas.height)
 
 var grd = ctx.createLinearGradient(0, 0, canvas.width, canvas.height)
+var grd2 = ctx.createLinearGradient(0, 0, canvas.width, canvas.height)
+
 const keys =[]
 document.body.addEventListener('keydown', function (e) {
   keys[e.keyCode] = true
@@ -27,8 +29,8 @@ let lastTime = 0
 
 
 const player = {
-  height: 20,
-  width: 20,
+  height: 40,
+  width: 40,
   posX: 0,
   posY: 0,
   velX: 0,
@@ -39,39 +41,96 @@ const player = {
 
 }
 
+const ball ={
+  posX: 40,
+  posY: 40,
+  velX: 3,
+  velY: 1,
+  speed: 3,
+  height: 5,
+  width: 5
+
+}
+
 
 const world = {
-  gravity: 0.3,
-  friction: 0.8
+  gravity: 0.2,
+  friction: 0.9
 }
+
+
+
 
 
 var boxes = []
 
+
+function Box(posX, posY, width){
+  this.posX = posX,
+  this.posY = posY,
+  this.width = width,
+  this.height= 10
+  boxes.push(this)
+}
+
+
+for(let i=0;i<15;i++){
+  new Box(Math.floor(Math.random() *400), Math.floor(Math.random() *200), Math.floor(Math.random() *100))
+  console.log(boxes)
+
+}
+
 // dimensions
+// boxes.push({
+//   posX: 100,
+//   posY: 100,
+//   width: 100,
+//   height: 20
+// })
+// boxes.push({
+//   posX: 0,
+//   posY: 120,
+//   width: 80,
+//   height: 20
+// })
+// boxes.push({
+//   posX: 10 - 10,
+//   posY: 80,
+//   width: 50,
+//   height: 20
+// })
+
 boxes.push({
-  x: 100,
-  y: 100,
-  width: 100,
-  height: 20
-})
-boxes.push({
-  x: 0,
-  y: 120,
-  width: 80,
-  height: 20
-})
-boxes.push({
-  x: 10 - 10,
-  y: 80,
-  width: 50,
+  posX: 0,
+  posY: 290,
+  width: 600,
   height: 20
 })
 
+boxes.push({
+  posX: 0,
+  posY: 0,
+  width: 600,
+  height: 10
+})
+
+boxes.push({
+  posX: 0,
+  posY: 0,
+  width: 10,
+  height: 300
+})
+
+boxes.push({
+  posX: 590,
+  posY: 0,
+  width: 10,
+  height: 300
+})
 
 function collisionDetection(shapeA, shapeB){
-  var vX = (shapeA.posX + (shapeA.width / 2)) - (shapeB.x + (shapeB.width / 2)),
-    vY = (shapeA.posY + (shapeA.height / 2)) - (shapeB.y + (shapeB.height / 2)),
+  var vX = (shapeA.posX + (shapeA.width / 2)) - (shapeB.posX + (shapeB.width / 2)),
+    vY = (shapeA.posY + (shapeA.height / 2)) - (shapeB.posY + (shapeB.height / 2)),
     // add the half widths and half heights of the objects
     hWidths = (shapeA.width / 2) + (shapeB.width / 2),
     hHeights = (shapeA.height / 2) + (shapeB.height / 2),
@@ -145,16 +204,20 @@ function gameLoop(timestamp) {
   player.velX *= world.friction
   player.velY += world.gravity
 
+  // ball.velX *= world.friction
+  // ball.velY *= world.gravity
+
   ctx.fillStyle = 'black'
-  ctx.globalAlpha = 1
+  ctx.globalAlpha = 0.2
 
 
 
 
   player.grounded = false
   boxes.map(x => {
-    ctx.fillRect(x.x, x.y, x.width, x.height)
+    ctx.fillRect(x.posX, x.posY, x.width, x.height)
     var dir  = collisionDetection(player, x)
+
     if (dir === 'l' || dir === 'r') {
       player.velX = 0
       player.jumping = false
@@ -165,20 +228,80 @@ function gameLoop(timestamp) {
     } else if (dir === 't') {
       player.velY = 0
     }
+
+    var dirB  = collisionDetection(ball, x)
+
+    if (dirB === 'l' || dirB === 'r') {
+      ball.velX = -ball.velX
+
+    } else if (dirB === 'b') {
+
+
+
+      ball.velY = -ball.velY
+
+
+    } else if (dirB === 't') {
+      console.log('t')
+      ball.velY = 5
+    }
+
+
+
   })
 
 
+  var dirC  = collisionDetection(ball, player)
+  // console.log(dirC)
+  if (dirC === 'l') {
 
+    ball.velX = -ball.velX
+
+
+
+  }else if (dirC === 'r') {
+
+    ball.velX = -ball.velX
+
+
+
+
+  } else if (dirC === 'b') {
+
+    console.log(ball.velY)
+
+    ball.velY = -ball.velY
+
+
+  } else if (dirC === 't') {
+    ball.velY = - ball.velY
+  }
 
   if(player.grounded){
     player.velY = 0
   }
+
+
   player.posX += player.velX
   player.posY += player.velY
 
-  ctx.fillStyle = 'rgba(250,250,250,0.8)'
-  ctx.strokeStyle = 'blue'
-  ctx.stroke()
+
+  ball.posX += ball.velX
+  ball.posY += ball.velY
+
+ctx.beginPath()
+ctx.arc(ball.posX, ball.posY, 5, 0, Math.PI*2, false)
+ctx.fillStyle = grd2
+ctx.fill()
+ctx.closePath()
+
+grd2.addColorStop(Math.random(), '#8ED6FF')
+grd2.addColorStop(Math.random(), '#004CB3')
+grd2.addColorStop(Math.random(), '#EE4CB3')
+grd2.addColorStop(Math.random(), '#E000EE')
+
+ctx.fillStyle = grd2
+
   ctx.fillRect(player.posX, player.posY, player.width, player.height)
 
 
