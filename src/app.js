@@ -13,12 +13,35 @@ var grd = ctx.createLinearGradient(0, 0, canvas.width, canvas.height)
 var grd2 = ctx.createLinearGradient(0, 0, canvas.width, canvas.height)
 
 
+//sound STUFF
+import Tone from 'tone'
+var tremolo = new Tone.Tremolo().start()
+var pingPong = new Tone.PingPongDelay('4n', 0.2).toMaster()
+var autoWah = new Tone.AutoWah(50, 6, -30).toMaster()
+var freeverb = new Tone.Freeverb().toMaster()
+freeverb.dampening.value = 500
+const synthA =  new Tone.DuoSynth().toMaster().chain(tremolo, pingPong, autoWah)
+synthA.attack = 0.01
+
+const synthB =  new Tone.AMSynth().toMaster().chain(tremolo, pingPong, autoWah)
+
+
+const channel = new Tone.Channel(-16).chain(freeverb, pingPong).toMaster()
+channel.volume.value = -20
+const synthC =  new Tone.MonoSynth().connect(channel)
+
+
+
+
+//DISPLAY  STATS
 const scoreDisplay = document.getElementById('score')
 const livesDisplay = document.getElementById('lives')
 const reset = document.getElementById('reset')
 let score = 0
-let lives = 11
+let lives = 31
 
+
+//KeyBoard Controls
 const keys =[]
 document.body.addEventListener('keydown', function (e) {
   console.log(e.keyCode)
@@ -34,7 +57,7 @@ document.body.addEventListener('keydown', function (e) {
   }
   if(e.keyCode===82){
     score = 0
-    lives = 11
+    lives = 31
     balls.length=1
     setup()
     reset.innerHTML = ''
@@ -50,6 +73,7 @@ document.body.addEventListener('keyup', function (e) {
 
 
 
+//Element Setup
 const player = {
   height: 50,
   width: 20,
@@ -96,10 +120,6 @@ function BallCreate(posX, posY){
 }
 
 
-setInterval(function () {
-  new BallCreate(Math.floor(Math.random()*1000),Math.floor(Math.random()*200))
-}, 5000)
-
 const world = {
   gravity: 0.2,
   friction: 0.9
@@ -130,10 +150,9 @@ function Box(posX, posY, width){
 }
 
 
-
+//Start / Reset
 function setup(){
   lives--
-  console.log('setup')
   goal.posX = Math.random() *500
   goal.posY = Math.random() *150
 
@@ -178,7 +197,7 @@ function setup(){
 setup()
 
 
-
+//Collision Detection
 function collisionDetection(shapeA, shapeB){
   var vX = (shapeA.posX + (shapeA.width / 2)) - (shapeB.posX + (shapeB.width / 2)),
     vY = (shapeA.posY + (shapeA.height / 2)) - (shapeB.posY + (shapeB.height / 2)),
@@ -215,7 +234,11 @@ function collisionDetection(shapeA, shapeB){
 }
 
 
+setInterval(function () {
+  new BallCreate(Math.floor(Math.random()*1000),Math.floor(Math.random()*200))
+}, 10000)
 
+//UPDATE LOOP
 
 function gameLoop() {
   if(lives === 0){
@@ -232,16 +255,19 @@ function gameLoop() {
         player.jumping = true
         player.grounded = false
         player.velY = -player.speed * 4
+        synthA.triggerAttackRelease(player.posY,0.01)
       }
     }if (keys[39]) {
     // right arrow
       if (player.velX < player.speed) {
         player.velX++
+        // synthA.triggerAttackRelease(player.posX,0.01)
       }
     }
     if (keys[37]) {         // left arrow
       if (player.velX > -player.speed) {
         player.velX--
+        // synthA.triggerAttackRelease(player.posX,0.01)
       }
     }
 
@@ -250,11 +276,11 @@ function gameLoop() {
 
 
     ctx.clearRect(0, 0, canvas.width, canvas.height)
-    ctx.globalAlpha = 0.2
+    ctx.globalAlpha = 0.3
     grd.addColorStop(0, '#8ED6FF')
     grd.addColorStop(0.2, '#004CB3')
-    grd.addColorStop(0.4, '#EE4CB3')
-    grd.addColorStop(0.6, '#E000EE')
+    grd.addColorStop(0.8, '#EE4CB3')
+    //grd.addColorStop(0.6, '#E000EE')
     ctx.fillStyle = grd
     ctx.fillRect(0, 0, canvas.width, canvas.height)
 
@@ -262,11 +288,7 @@ function gameLoop() {
     player.velX *= world.friction
     player.velY += world.gravity
 
-    // ball.velX *= world.friction
-    // ball.velY *= world.gravity
 
-    ctx.fillStyle = 'black'
-    ctx.globalAlpha = 0.2
 
 
 
@@ -285,6 +307,7 @@ function gameLoop() {
         player.jumping = false
       } else if (dir === 't') {
         player.velY = 0
+
       }
       balls.map(ball => {
         var dirB  = collisionDetection(ball, x)
@@ -302,6 +325,13 @@ function gameLoop() {
         } else if (dirB === 't') {
           console.log('t')
           ball.velY = 5
+          if(ball.posY <50){
+          synthC.triggerAttackRelease(1+ball.posY*20,0.01)
+        }
+        if(ball.posY >50){
+        synthB.triggerAttackRelease(ball.posY*2,0.01)
+      }
+
         }
       })
 
@@ -381,14 +411,14 @@ function gameLoop() {
 
       score++
       setup()
-      lives++
+      lives+=6
 
 
     }else if (dirC === 'r') {
 
       score++
       setup()
-      lives++
+      lives+=6
 
 
 
@@ -399,7 +429,7 @@ function gameLoop() {
 
       score++
       setup()
-      lives++
+      lives+=6
 
 
     } else if (dirC === 't') {
@@ -416,7 +446,7 @@ function gameLoop() {
     balls.map(ball => {
       ball.posX += ball.velX
       ball.posY += ball.velY
-
+      ctx.globalAlpha = 0.8
       ctx.beginPath()
       ctx.arc(ball.posX, ball.posY, 5, 0, Math.PI*2, false)
       ctx.fillStyle = grd2
@@ -427,10 +457,11 @@ function gameLoop() {
 
 
 
-    grd2.addColorStop(Math.random(), '#8ED6FF')
-    grd2.addColorStop(Math.random(), '#004CB3')
-    grd2.addColorStop(Math.random(), '#EE4CB3')
-    grd2.addColorStop(Math.random(), '#E000EE')
+    grd2.addColorStop(0.8, '#8ED6FF')
+
+    grd2.addColorStop(0.2, '#EE4CB3')
+
+
 
     ctx.fillStyle = grd2
 
