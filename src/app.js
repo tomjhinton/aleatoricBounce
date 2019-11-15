@@ -48,12 +48,15 @@ document.body.addEventListener('keydown', function (e) {
   console.log(e.keyCode)
   if(e.keyCode===38){
     console.log('hiya')
-    if(player.width === 20){
+    if(player.width === 20 && !player.grounded){
       player.width = 50
       player.height = 20
-    } else if(player.width === 50){
+    } else if(player.width === 50 && !player.grounded){
       player.width = 20
       player.height = 50
+      console.log(player.posY)
+
+
     }
   }
   if(e.keyCode===82){
@@ -242,14 +245,15 @@ setInterval(function () {
 //UPDATE LOOP
 
 function gameLoop() {
+  scoreDisplay.innerHTML = score
+  livesDisplay.innerHTML = lives
+  ballsIn.innerHTML = balls.length
   if(lives === 0){
     reset.innerHTML = 'GAME OVER: R to RESET'
   }
   if(lives>=0){
 
-    scoreDisplay.innerHTML = score
-    livesDisplay.innerHTML = lives
-    ballsIn.innerHTML = balls.length
+
     if (keys[32] ) {
 
       // up arrow or space
@@ -328,7 +332,7 @@ function gameLoop() {
           console.log('t')
           ball.velY = 5
           if(ball.posY <50){
-            synthC.triggerAttackRelease(1+ball.posY*20,0.01)
+            synthC.triggerAttackRelease(ball.posX/2,0.01)
           }
           if(ball.posY >50){
             synthB.triggerAttackRelease(ball.posY*2,0.01)
@@ -410,35 +414,12 @@ function gameLoop() {
 
     var dirC  = collisionDetection(goal, player)
     // console.log(dirC)
-    if (dirC === 'l') {
+    if (dirC === 'l' || dirC === 'r' || dirC === 'b' || dirC === 't'  ) {
 
       score++
       setup()
       lives+=6
 
-
-    }else if (dirC === 'r') {
-
-      score++
-      setup()
-      lives+=6
-
-
-
-
-    } else if (dirC === 'b') {
-
-      console.log(ball.velY)
-
-      score++
-      setup()
-      lives+=6
-
-
-    } else if (dirC === 't') {
-      score++
-      setup()
-      lives++
     }
 
 
