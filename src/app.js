@@ -13,19 +13,11 @@ var grd = ctx.createLinearGradient(0, 0, canvas.width, canvas.height)
 var grd2 = ctx.createLinearGradient(0, 0, canvas.width, canvas.height)
 
 
-const player = {
-  height: 50,
-  width: 20,
-  posX: 0,
-  posY: 0,
-  velX: 0,
-  velY: 0,
-  speed: 3,
-  jumping: false,
-  grounded: false
-
-}
-
+const scoreDisplay = document.getElementById('score')
+const livesDisplay = document.getElementById('lives')
+const reset = document.getElementById('reset')
+let score = 0
+let lives = 11
 
 const keys =[]
 document.body.addEventListener('keydown', function (e) {
@@ -40,6 +32,15 @@ document.body.addEventListener('keydown', function (e) {
       player.height = 50
     }
   }
+  if(e.keyCode===82){
+    score = 0
+    lives = 11
+    balls.length=1
+    setup()
+    reset.innerHTML = ''
+
+  }
+
   keys[e.keyCode] = true
 })
 
@@ -49,8 +50,19 @@ document.body.addEventListener('keyup', function (e) {
 
 
 
+const player = {
+  height: 50,
+  width: 20,
+  posX: 0,
+  posY: 0,
+  velX: 0,
+  velY: 0,
+  speed: 3,
+  jumping: false,
+  grounded: false
 
-let lastTime = 0
+}
+
 
 
 
@@ -82,6 +94,11 @@ function BallCreate(posX, posY){
   balls.push(this)
 
 }
+
+
+setInterval(function () {
+  new BallCreate(Math.floor(Math.random()*1000),Math.floor(Math.random()*200))
+}, 5000)
 
 const world = {
   gravity: 0.2,
@@ -115,6 +132,7 @@ function Box(posX, posY, width){
 
 
 function setup(){
+  lives--
   console.log('setup')
   goal.posX = Math.random() *500
   goal.posY = Math.random() *150
@@ -151,7 +169,7 @@ function setup(){
     height: 600
   })
 
-  while(boxes.length<15){
+  while(boxes.length<25){
     new Box(Math.floor(Math.random() *1400)+10, Math.floor(Math.random() *590)+10, Math.floor(Math.random() *100+50))
 
   }
@@ -200,186 +218,232 @@ function collisionDetection(shapeA, shapeB){
 
 
 function gameLoop() {
-
-  if (keys[32] ) {
-
-    // up arrow or space
-    if (!player.jumping && player.grounded) {
-      player.jumping = true
-      player.grounded = false
-      player.velY = -player.speed * 4
-    }
-  }if (keys[39]) {
-  // right arrow
-    if (player.velX < player.speed) {
-      player.velX++
-    }
+  if(lives === 0){
+    reset.innerHTML = 'GAME OVER: R to RESET'
   }
-  if (keys[37]) {         // left arrow
-    if (player.velX > -player.speed) {
-      player.velX--
+  if(lives>=0){
+
+    scoreDisplay.innerHTML = score
+    livesDisplay.innerHTML = lives
+    if (keys[32] ) {
+
+      // up arrow or space
+      if (!player.jumping && player.grounded) {
+        player.jumping = true
+        player.grounded = false
+        player.velY = -player.speed * 4
+      }
+    }if (keys[39]) {
+    // right arrow
+      if (player.velX < player.speed) {
+        player.velX++
+      }
     }
-  }
-
-
-
-
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height)
-  ctx.globalAlpha = 0.2
-  grd.addColorStop(0, '#8ED6FF')
-  grd.addColorStop(0.2, '#004CB3')
-  grd.addColorStop(0.4, '#EE4CB3')
-  grd.addColorStop(0.6, '#E000EE')
-  ctx.fillStyle = grd
-  ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-
-  player.velX *= world.friction
-  player.velY += world.gravity
-
-  // ball.velX *= world.friction
-  // ball.velY *= world.gravity
-
-  ctx.fillStyle = 'black'
-  ctx.globalAlpha = 0.2
-
-
-
-
-  player.grounded = false
-  boxes.map(x => {
-    ctx.fillRect(x.posX, x.posY, x.width, x.height)
-    var dir  = collisionDetection(player, x)
-
-    if (dir === 'l' || dir === 'r') {
-      player.velX = 0
-      player.jumping = false
-    } else if (dir === 'b') {
-
-      player.grounded = true
-      player.jumping = false
-    } else if (dir === 't') {
-      player.velY = 0
+    if (keys[37]) {         // left arrow
+      if (player.velX > -player.speed) {
+        player.velX--
+      }
     }
-    balls.map(ball => {
-      var dirB  = collisionDetection(ball, x)
 
-      if (dirB === 'l' || dirB === 'r') {
+
+
+
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    ctx.globalAlpha = 0.2
+    grd.addColorStop(0, '#8ED6FF')
+    grd.addColorStop(0.2, '#004CB3')
+    grd.addColorStop(0.4, '#EE4CB3')
+    grd.addColorStop(0.6, '#E000EE')
+    ctx.fillStyle = grd
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+
+    player.velX *= world.friction
+    player.velY += world.gravity
+
+    // ball.velX *= world.friction
+    // ball.velY *= world.gravity
+
+    ctx.fillStyle = 'black'
+    ctx.globalAlpha = 0.2
+
+
+
+
+    player.grounded = false
+    boxes.map(x => {
+      ctx.fillRect(x.posX, x.posY, x.width, x.height)
+      var dir  = collisionDetection(player, x)
+
+      if (dir === 'l' || dir === 'r') {
+        player.velX = 0
+        player.jumping = false
+      } else if (dir === 'b') {
+
+        player.grounded = true
+        player.jumping = false
+      } else if (dir === 't') {
+        player.velY = 0
+      }
+      balls.map(ball => {
+        var dirB  = collisionDetection(ball, x)
+
+        if (dirB === 'l' || dirB === 'r') {
+          ball.velX = -ball.velX
+
+        } else if (dirB === 'b') {
+
+
+
+          ball.velY = -ball.velY
+
+
+        } else if (dirB === 't') {
+          console.log('t')
+          ball.velY = 5
+        }
+      })
+
+
+    })
+
+    balls.map(ball =>{
+      var dirC  = collisionDetection(ball, player)
+      // console.log(dirC)
+      if (dirC === 'l') {
+
         ball.velX = -ball.velX
 
-  } else if (dirB === 'b') {
+
+
+      }else if (dirC === 'r') {
+
+        ball.velX = -ball.velX
 
 
 
-    ball.velY = -ball.velY
+
+      } else if (dirC === 'b') {
+
+        console.log(ball.velY)
+
+        ball.velY = -ball.velY
 
 
-  } else if (dirB === 't') {
-      console.log('t')
-      ball.velY = 5
+      } else if (dirC === 't') {
+        ball.velY = - ball.velY
+      }
+
+
+      var goalD  = collisionDetection(ball, goal)
+
+      if (goalD === 'l') {
+
+        setup()
+
+        new BallCreate(Math.floor(Math.random()*1000),Math.floor(Math.random()*200))
+
+
+
+      }else if (goalD === 'r') {
+
+        setup()
+
+        new BallCreate(Math.floor(Math.random()*1000),Math.floor(Math.random()*200))
+
+
+
+
+      } else if (goalD === 'b') {
+
+
+        setup()
+
+        new BallCreate(Math.floor(Math.random()*1000),Math.floor(Math.random()*200))
+
+
+      } else if (goalD === 't') {
+        setup()
+
+        new BallCreate(Math.floor(Math.random()*1000),Math.floor(Math.random()*200))
+      }
+    })
+
+    if(player.grounded){
+      player.velY = 0
     }
+
+
+    var dirC  = collisionDetection(goal, player)
+    // console.log(dirC)
+    if (dirC === 'l') {
+
+      score++
+      setup()
+      lives++
+
+
+    }else if (dirC === 'r') {
+
+      score++
+      setup()
+      lives++
+
+
+
+
+    } else if (dirC === 'b') {
+
+      console.log(ball.velY)
+
+      score++
+      setup()
+      lives++
+
+
+    } else if (dirC === 't') {
+      score++
+      setup()
+      lives++
+    }
+
+
+
+    player.posX += player.velX
+    player.posY += player.velY
+
+    balls.map(ball => {
+      ball.posX += ball.velX
+      ball.posY += ball.velY
+
+      ctx.beginPath()
+      ctx.arc(ball.posX, ball.posY, 5, 0, Math.PI*2, false)
+      ctx.fillStyle = grd2
+      ctx.fill()
+      ctx.closePath()
     })
 
 
-  })
-
-  balls.map(ball =>{
-    var dirC  = collisionDetection(ball, player)
-  // console.log(dirC)
-  if (dirC === 'l') {
-
-    ball.velX = -ball.velX
 
 
+    grd2.addColorStop(Math.random(), '#8ED6FF')
+    grd2.addColorStop(Math.random(), '#004CB3')
+    grd2.addColorStop(Math.random(), '#EE4CB3')
+    grd2.addColorStop(Math.random(), '#E000EE')
 
-  }else if (dirC === 'r') {
-
-    ball.velX = -ball.velX
-
-
-
-
-  } else if (dirC === 'b') {
-
-    console.log(ball.velY)
-
-    ball.velY = -ball.velY
-
-
-  } else if (dirC === 't') {
-    ball.velY = - ball.velY
-  }
-
-
-  var goalD  = collisionDetection(ball, goal)
-
-  if (goalD === 'l') {
-
-    setup()
-    new BallCreate(Math.floor(Math.random()*1000),Math.floor(Math.random()*200))
-
-
-
-  }else if (goalD === 'r') {
-
-    setup()
-    new BallCreate(Math.floor(Math.random()*1000),Math.floor(Math.random()*200))
-
-
-
-
-  } else if (goalD === 'b') {
-
-
-    setup()
-    new BallCreate(Math.floor(Math.random()*1000),Math.floor(Math.random()*200))
-
-
-  } else if (goalD === 't') {
-    setup()
-    new BallCreate(Math.floor(Math.random()*1000),Math.floor(Math.random()*200))
-  }
-})
-
-  if(player.grounded){
-    player.velY = 0
-  }
-
-
-  player.posX += player.velX
-  player.posY += player.velY
-
-  balls.map(ball => {
-    ball.posX += ball.velX
-    ball.posY += ball.velY
-
-    ctx.beginPath()
-    ctx.arc(ball.posX, ball.posY, 5, 0, Math.PI*2, false)
     ctx.fillStyle = grd2
-    ctx.fill()
-    ctx.closePath()
-  })
+
+    ctx.fillRect(player.posX, player.posY, player.width, player.height)
+
+    ctx.globalAlpha = 1
+    ctx.fillStyle = 'rgba(255,255,255,0.8 )'
+    ctx.fillRect(goal.posX, goal.posY, goal.width, goal.height)
 
 
-
-
-  grd2.addColorStop(Math.random(), '#8ED6FF')
-  grd2.addColorStop(Math.random(), '#004CB3')
-  grd2.addColorStop(Math.random(), '#EE4CB3')
-  grd2.addColorStop(Math.random(), '#E000EE')
-
-  ctx.fillStyle = grd2
-
-ctx.fillRect(player.posX, player.posY, player.width, player.height)
-
-ctx.globalAlpha = 1
-ctx.fillStyle = 'rgba(255,255,255,0.8 )'
-ctx.fillRect(goal.posX, goal.posY, goal.width, goal.height)
-
-
-
+  }
   requestAnimationFrame(gameLoop)
+
 }
 
 
