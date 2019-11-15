@@ -12,8 +12,34 @@ ctx.fillRect(0, 0, canvas.width, canvas.height)
 var grd = ctx.createLinearGradient(0, 0, canvas.width, canvas.height)
 var grd2 = ctx.createLinearGradient(0, 0, canvas.width, canvas.height)
 
+
+const player = {
+  height: 50,
+  width: 20,
+  posX: 0,
+  posY: 0,
+  velX: 0,
+  velY: 0,
+  speed: 3,
+  jumping: false,
+  grounded: false
+
+}
+
+
 const keys =[]
 document.body.addEventListener('keydown', function (e) {
+  console.log(e.keyCode)
+  if(e.keyCode===38){
+    console.log('hiya')
+    if(player.width === 20){
+      player.width = 50
+      player.height = 20
+    } else if(player.width === 50){
+      player.width = 20
+      player.height = 50
+    }
+  }
   keys[e.keyCode] = true
 })
 
@@ -28,18 +54,7 @@ let lastTime = 0
 
 
 
-const player = {
-  height: 20,
-  width: 20,
-  posX: 0,
-  posY: 0,
-  velX: 0,
-  velY: 0,
-  speed: 3,
-  jumping: false,
-  grounded: false
 
-}
 
 const ball ={
   posX: 40,
@@ -52,6 +67,21 @@ const ball ={
 
 }
 
+const balls = []
+
+balls.push(ball)
+
+function BallCreate(posX, posY){
+  this.posX = posX,
+  this.posY = posY,
+  this.velX = 3,
+  this.velY = 1,
+  this.speed = 3+balls.length,
+  this.height = 5,
+  this.width = 5
+  balls.push(this)
+
+}
 
 const world = {
   gravity: 0.2,
@@ -68,41 +98,42 @@ const goal = {
 
 
 var boxes = []
-
+let check
 
 function Box(posX, posY, width){
+  console.log(this +'+' + posY)
   this.posX = posX,
   this.posY = posY,
   this.width = width,
   this.height= 10
-  boxes.push(this)
+  check = boxes.filter(x => x.posY !== this.posY && this.posY > (x.posY-10) && this.posY < (x.posY+10) )
+  if(check.length === 0){
+    boxes.push(this)
+  }
 }
 
 
-function setup(){
 
+function setup(){
+  console.log('setup')
   goal.posX = Math.random() *500
   goal.posY = Math.random() *150
 
   boxes = []
-  for(let i=0;i<15;i++){
-    new Box(Math.floor(Math.random() *400), Math.floor(Math.random() *200), Math.floor(Math.random() *100))
-    console.log(boxes)
 
-  }
 
   // border walls
   boxes.push({
     posX: 0,
-    posY: 290,
-    width: 600,
-    height: 20
+    posY: 590,
+    width: 1200,
+    height: 10
   })
 
   boxes.push({
     posX: 0,
     posY: 0,
-    width: 600,
+    width: 1200,
     height: 10
   })
 
@@ -110,16 +141,20 @@ function setup(){
     posX: 0,
     posY: 0,
     width: 10,
-    height: 300
+    height: 600
   })
 
   boxes.push({
-    posX: 590,
+    posX: 1190,
     posY: 0,
     width: 10,
-    height: 300
+    height: 600
   })
 
+  while(boxes.length<15){
+    new Box(Math.floor(Math.random() *1400)+10, Math.floor(Math.random() *590)+10, Math.floor(Math.random() *100+50))
+
+  }
 
 }
 setup()
@@ -164,14 +199,15 @@ function collisionDetection(shapeA, shapeB){
 
 
 
-function gameLoop(timestamp) {
+function gameLoop() {
 
-  if (keys[38] || keys[32]) {
+  if (keys[32] ) {
+
     // up arrow or space
     if (!player.jumping && player.grounded) {
       player.jumping = true
       player.grounded = false
-      player.velY = -player.speed * 2
+      player.velY = -player.speed * 4
     }
   }if (keys[39]) {
   // right arrow
@@ -186,10 +222,10 @@ function gameLoop(timestamp) {
   }
 
 
-  const deltaTime = timestamp - lastTime
-  lastTime = timestamp
 
-  ctx.clearRect(0, 0, 800, 600)
+
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
   ctx.globalAlpha = 0.2
   grd.addColorStop(0, '#8ED6FF')
   grd.addColorStop(0.2, '#004CB3')
@@ -226,30 +262,30 @@ function gameLoop(timestamp) {
     } else if (dir === 't') {
       player.velY = 0
     }
+    balls.map(ball => {
+      var dirB  = collisionDetection(ball, x)
 
-    var dirB  = collisionDetection(ball, x)
+      if (dirB === 'l' || dirB === 'r') {
+        ball.velX = -ball.velX
 
-    if (dirB === 'l' || dirB === 'r') {
-      ball.velX = -ball.velX
-
-    } else if (dirB === 'b') {
-
-
-
-      ball.velY = -ball.velY
+  } else if (dirB === 'b') {
 
 
-    } else if (dirB === 't') {
+
+    ball.velY = -ball.velY
+
+
+  } else if (dirB === 't') {
       console.log('t')
       ball.velY = 5
     }
-
+    })
 
 
   })
 
-
-  var dirC  = collisionDetection(ball, player)
+  balls.map(ball =>{
+    var dirC  = collisionDetection(ball, player)
   // console.log(dirC)
   if (dirC === 'l') {
 
@@ -281,12 +317,14 @@ function gameLoop(timestamp) {
   if (goalD === 'l') {
 
     setup()
+    new BallCreate(Math.floor(Math.random()*1000),Math.floor(Math.random()*200))
 
 
 
   }else if (goalD === 'r') {
 
     setup()
+    new BallCreate(Math.floor(Math.random()*1000),Math.floor(Math.random()*200))
 
 
 
@@ -295,11 +333,14 @@ function gameLoop(timestamp) {
 
 
     setup()
+    new BallCreate(Math.floor(Math.random()*1000),Math.floor(Math.random()*200))
 
 
   } else if (goalD === 't') {
     setup()
+    new BallCreate(Math.floor(Math.random()*1000),Math.floor(Math.random()*200))
   }
+})
 
   if(player.grounded){
     player.velY = 0
@@ -309,15 +350,19 @@ function gameLoop(timestamp) {
   player.posX += player.velX
   player.posY += player.velY
 
+  balls.map(ball => {
+    ball.posX += ball.velX
+    ball.posY += ball.velY
 
-  ball.posX += ball.velX
-  ball.posY += ball.velY
+    ctx.beginPath()
+    ctx.arc(ball.posX, ball.posY, 5, 0, Math.PI*2, false)
+    ctx.fillStyle = grd2
+    ctx.fill()
+    ctx.closePath()
+  })
 
-  ctx.beginPath()
-  ctx.arc(ball.posX, ball.posY, 5, 0, Math.PI*2, false)
-  ctx.fillStyle = grd2
-  ctx.fill()
-  ctx.closePath()
+
+
 
   grd2.addColorStop(Math.random(), '#8ED6FF')
   grd2.addColorStop(Math.random(), '#004CB3')
