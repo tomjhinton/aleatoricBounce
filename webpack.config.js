@@ -21,6 +21,10 @@ module.exports = {
       {
         test: /\.txt$/i,
         use: 'raw-loader'
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/,
+        use: 'file-loader'
       }
     ]
   },
