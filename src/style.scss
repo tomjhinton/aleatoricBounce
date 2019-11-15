@@ -1,7 +1,19 @@
+
+@font-face {
+  font-family: "Tapeworm";
+  src: url("/images/Tapeworm-Regular.otf") format("opentype");
+}
+
 header{
+  font-family: "Tapeworm";
+
   margin: 20px;
 }
 
 .sidebar{
   background-color: rgba(20, 20, 100, 0.4);
+}
+
+.banner{
+  margin-right: 2em;
 }

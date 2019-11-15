@@ -36,6 +36,7 @@ const synthC =  new Tone.MonoSynth().connect(channel)
 //DISPLAY  STATS
 const scoreDisplay = document.getElementById('score')
 const livesDisplay = document.getElementById('lives')
+const ballsIn = document.getElementById('ballsIn')
 const reset = document.getElementById('reset')
 let score = 0
 let lives = 31
@@ -248,6 +249,7 @@ function gameLoop() {
 
     scoreDisplay.innerHTML = score
     livesDisplay.innerHTML = lives
+    ballsIn.innerHTML = balls.length
     if (keys[32] ) {
 
       // up arrow or space
@@ -326,11 +328,11 @@ function gameLoop() {
           console.log('t')
           ball.velY = 5
           if(ball.posY <50){
-          synthC.triggerAttackRelease(1+ball.posY*20,0.01)
-        }
-        if(ball.posY >50){
-        synthB.triggerAttackRelease(ball.posY*2,0.01)
-      }
+            synthC.triggerAttackRelease(1+ball.posY*20,0.01)
+          }
+          if(ball.posY >50){
+            synthB.triggerAttackRelease(ball.posY*2,0.01)
+          }
 
         }
       })
