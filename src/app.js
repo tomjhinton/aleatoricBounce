@@ -30,7 +30,7 @@ const channel = new Tone.Channel(-16).chain(freeverb, pingPong).toMaster()
 channel.volume.value = -20
 const synthC =  new Tone.MonoSynth().connect(channel)
 
-
+var fmSynth = new Tone.FMSynth().toMaster()
 
 
 //DISPLAY  STATS
@@ -375,7 +375,7 @@ function gameLoop() {
         setup()
 
         new BallCreate(Math.floor(Math.random()*1000),Math.floor(Math.random()*200))
-
+        fmSynth.triggerAttackRelease(goal.posY*20,0.01)
 
 
       }else if (goalD === 'r') {
@@ -383,7 +383,7 @@ function gameLoop() {
         setup()
 
         new BallCreate(Math.floor(Math.random()*1000),Math.floor(Math.random()*200))
-
+        fmSynth.triggerAttackRelease(goal.posY*30,0.01)
 
 
 
@@ -393,12 +393,13 @@ function gameLoop() {
         setup()
 
         new BallCreate(Math.floor(Math.random()*1000),Math.floor(Math.random()*200))
-
+        fmSynth.triggerAttackRelease(goal.posY*10,0.01)
 
       } else if (goalD === 't') {
         setup()
 
         new BallCreate(Math.floor(Math.random()*1000),Math.floor(Math.random()*200))
+        fmSynth.triggerAttackRelease(goal.posY*40,0.01)
       }
     })
 
