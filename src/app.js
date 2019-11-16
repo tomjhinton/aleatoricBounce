@@ -45,16 +45,15 @@ let lives = 31
 //KeyBoard Controls
 const keys =[]
 document.body.addEventListener('keydown', function (e) {
-  console.log(e.keyCode)
+
   if(e.keyCode===38){
-    console.log('hiya')
+
     if(player.width === 20 && !player.grounded){
       player.width = 50
       player.height = 20
     } else if(player.width === 50 && !player.grounded){
       player.width = 20
       player.height = 50
-      console.log(player.posY)
 
 
     }
@@ -142,7 +141,6 @@ var boxes = []
 let check
 
 function Box(posX, posY, width){
-  console.log(this +'+' + posY)
   this.posX = posX,
   this.posY = posY,
   this.width = width,
@@ -157,8 +155,8 @@ function Box(posX, posY, width){
 //Start / Reset
 function setup(){
   lives--
-  goal.posX = Math.random() *500
-  goal.posY = Math.random() *150
+  goal.posX = (Math.random() *1100)+ 20
+  goal.posY = (Math.random() *200)+20
 
   boxes = []
 
@@ -239,19 +237,22 @@ function collisionDetection(shapeA, shapeB){
 
 
 setInterval(function () {
-  new BallCreate(Math.floor(Math.random()*1000),Math.floor(Math.random()*200))
+  if(lives>0){
+    new BallCreate(Math.floor(Math.random()*1000),Math.floor(Math.random()*200))
+  }
 }, 10000)
 
 //UPDATE LOOP
 
 function gameLoop() {
-  scoreDisplay.innerHTML = score
-  livesDisplay.innerHTML = lives
-  ballsIn.innerHTML = balls.length
+
   if(lives === 0){
     reset.innerHTML = 'GAME OVER: R to RESET'
   }
   if(lives>=0){
+    scoreDisplay.innerHTML = score
+    livesDisplay.innerHTML = lives
+    ballsIn.innerHTML = balls.length
 
 
     if (keys[32] ) {
@@ -329,7 +330,7 @@ function gameLoop() {
 
 
         } else if (dirB === 't') {
-          console.log('t')
+
           ball.velY = 5
           if(ball.posY <50){
             synthC.triggerAttackRelease(ball.posX/2,0.01)
@@ -362,7 +363,7 @@ function gameLoop() {
 
       } else if (dirC === 'b') {
 
-        console.log(ball.velY)
+
 
         ball.velY = -ball.velY
 
