@@ -13,7 +13,7 @@ var options = {
   showCursor: false
 
 }
-let typed = new Typed('#title', options)
+const typed = new Typed('#title', options)
 
 
 var resetT = {
@@ -22,10 +22,10 @@ var resetT = {
   loop: true,
   loopCount: Infinity,
   backSpeed: 100,
-  showCursor: true,
+  showCursor: false
 
 }
-let resetTyped = new Typed('#reset', resetT)
+const resetTyped = new Typed('#reset', resetT)
 
 
 
@@ -67,7 +67,7 @@ const livesDisplay = document.getElementById('lives')
 const ballsIn = document.getElementById('ballsIn')
 const reset = document.getElementById('reset')
 let score = 0
-let lives = 1
+let lives = 31
 
 
 //KeyBoard Controls
@@ -276,11 +276,13 @@ setInterval(function () {
 
 function gameLoop() {
 
-  if(lives === 0){
+  if(lives <= 0){
     canvas.classList.add('over')
     reset.classList.remove('hide')
+    lives = 0
+    livesDisplay.innerHTML = lives
   }
-  if(lives>=0){
+  if(lives>0){
     scoreDisplay.innerHTML = score
     livesDisplay.innerHTML = lives
     ballsIn.innerHTML = balls.length
