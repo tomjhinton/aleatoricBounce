@@ -22,6 +22,23 @@ header{
 }
 
 
+.over{
+  filter: blur(15px)  grayscale(100%);
+
+}
+
+
+#reset{
+  position: absolute;
+  margin: auto;
+  left: 200px;
+  top: 250px;
+  font-size: 5em;
+  -webkit-animation: pulsate 10s ease-out;
+  -webkit-animation-iteration-count: infinite;
+}
+
+
 header:hover{
   -webkit-animation: banner 10s ease-out;
   -webkit-animation-iteration-count: 1;
@@ -33,6 +50,18 @@ header:hover{
   }
 
 }
+
+
+
+
+.hide{
+  visibility: hidden;
+}
+
+
+
+
+
 @-webkit-keyframes banner {
     0% {
         opacity: 1;

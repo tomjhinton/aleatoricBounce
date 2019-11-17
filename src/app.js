@@ -3,7 +3,6 @@ import './style.scss'
 import Typed from 'typed.js'
 
 
-const title = document.getElementById('title')
 var options = {
   strings: ['', 'aleatoricBounce'],
   typeSpeed: 100,
@@ -15,6 +14,21 @@ var options = {
 
 }
 let typed = new Typed('#title', options)
+
+
+var resetT = {
+  strings: ['', 'GAME OVER   : R TO RESET'],
+  typeSpeed: 100,
+  loop: true,
+  loopCount: Infinity,
+  backSpeed: 100,
+  showCursor: true,
+
+}
+let resetTyped = new Typed('#reset', resetT)
+
+
+
 const canvas = document.getElementById('canvas')
 const ctx = canvas.getContext('2d')
 
@@ -53,7 +67,7 @@ const livesDisplay = document.getElementById('lives')
 const ballsIn = document.getElementById('ballsIn')
 const reset = document.getElementById('reset')
 let score = 0
-let lives = 31
+let lives = 1
 
 
 //KeyBoard Controls
@@ -78,6 +92,8 @@ document.body.addEventListener('keydown', function (e) {
     balls.length=1
     setup()
     reset.innerHTML = ''
+    canvas.classList.remove('over')
+    reset.classList.add('hide')
 
   }
 
@@ -261,8 +277,8 @@ setInterval(function () {
 function gameLoop() {
 
   if(lives === 0){
-
-    reset.innerHTML = 'GAME OVER: R to RESET'
+    canvas.classList.add('over')
+    reset.classList.remove('hide')
   }
   if(lives>=0){
     scoreDisplay.innerHTML = score
