@@ -8,12 +8,72 @@ header{
   font-family: "Tapeworm";
 
   margin: 20px;
+
 }
 
-.sidebar{
-  background-color: rgba(20, 20, 100, 0.4);
+#title{
+  min-height: 2em;
 }
 
 .banner{
   margin-right: 2em;
+  color:red;
+
+}
+
+
+header:hover{
+  -webkit-animation: banner 10s ease-out;
+  -webkit-animation-iteration-count: 1;
+  transition: 5s;
+  .banner{
+
+    -webkit-animation: pulsate 10s ease-out;
+    -webkit-animation-iteration-count: infinite;
+  }
+
+}
+@-webkit-keyframes banner {
+    0% {
+        opacity: 1;
+        font-size: 100%;
+
+    }
+
+
+    50% {
+        opacity: 0.8;
+        font-size: 100%;
+        transform: skewX(25deg);
+        margin-right: 4em;
+
+    }
+    100% {
+        opacity: 1;
+        font-size: 100%;
+
+    }
+}
+
+
+@-webkit-keyframes pulsate {
+    0% {
+
+        color:#8ED6FF;
+
+
+    }
+
+
+    50% {
+
+        color:pink;
+
+
+    }
+    100% {
+
+        color:#8ED6FF;
+
+    }
 }

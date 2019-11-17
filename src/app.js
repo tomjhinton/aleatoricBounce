@@ -1,6 +1,20 @@
 import 'bulma'
 import './style.scss'
+import Typed from 'typed.js'
 
+
+const title = document.getElementById('title')
+var options = {
+  strings: ['', 'aleatoricBounce'],
+  typeSpeed: 100,
+  loop: true,
+  loopCount: 2,
+  backDelay: 2000,
+  backSpeed: 100,
+  showCursor: false
+
+}
+let typed = new Typed('#title', options)
 const canvas = document.getElementById('canvas')
 const ctx = canvas.getContext('2d')
 
@@ -247,6 +261,7 @@ setInterval(function () {
 function gameLoop() {
 
   if(lives === 0){
+
     reset.innerHTML = 'GAME OVER: R to RESET'
   }
   if(lives>=0){
